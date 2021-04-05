@@ -4,7 +4,6 @@ import edu.princeton.cs.algs4.SET;
 
 import java.util.LinkedList;
 
-//Throw an IllegalArgumentException if any argument is null
 public class PointSET {
     private final SET<Point2D> point2DSet;
 
@@ -36,6 +35,8 @@ public class PointSET {
 
     // all points that are inside the rectangle (or on the boundary)
     public Iterable<Point2D> range(RectHV rect) {
+        if (rect == null) throw new IllegalArgumentException();
+
         LinkedList<Point2D> points = new LinkedList<>();
         point2DSet.iterator().forEachRemaining(p -> {
             if (rect.contains(p)) points.addLast(p);
@@ -45,6 +46,8 @@ public class PointSET {
 
     // a nearest neighbor in the set to point p; null if the set is empty
     public Point2D nearest(Point2D p) {
+        if (p == null) throw new IllegalArgumentException();
+
         double minDistance = 1;
         Point2D champion = null;
         for (Point2D point : point2DSet) {

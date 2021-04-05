@@ -29,7 +29,4 @@ class PointSETTest {
         assertThat(testee.range(TOTAL_AREA)).hasSize(1).containsOnly(new Point2D(0.1d, 0.2d));
         assertThat(testee.range(new RectHV(0.3, 0.3, 0.5, 0.6))).isEmpty();
     }
-
-    //search in rectangle
-
 }
