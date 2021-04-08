@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PointSETTest {
+class KdTreeTest {
     private static final RectHV TOTAL_AREA = new RectHV(0, 0, 1, 1);
-    private PointSET testee;
+    private KdTree testee;
 
     @BeforeEach
     void setUp() {
-        testee = new PointSET();
+        testee = new KdTree();
     }
 
     @Test
