@@ -4,17 +4,17 @@
 
 import edu.princeton.cs.algs4.Point2D;
 
-class Tree2dNode {
+class KdTreeNode {
     private final Point2D point2D;
-    private Tree2dNode previous;
-    private Tree2dNode left;
-    private Tree2dNode right;
+    private KdTreeNode previous;
+    private KdTreeNode left;
+    private KdTreeNode right;
 
-    public static Tree2dNode with(Point2D p) {
-        return new Tree2dNode(p);
+    public static KdTreeNode with(Point2D p) {
+        return new KdTreeNode(p);
     }
 
-    private Tree2dNode(Point2D point2D) {
+    private KdTreeNode(Point2D point2D) {
         this.point2D = point2D;
     }
 
