@@ -1,5 +1,6 @@
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.StdDraw;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -8,8 +9,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class KdTree {
-    private KdTreeNode root;
-    private int size;
+    private KdTreeNode root = KdTreeNode.empty();
+    private int size = 0;
 
     boolean isEmpty() {
         return size == 0;
@@ -19,15 +20,17 @@ public class KdTree {
         return size;
     }
 
-    public void insert(Point2D p) {
-        if (isEmpty()) {
-            root = KdTreeNode.with(p);
-        }
+    public void insert(Point2D point2D) {
+        if (contains(point2D))  return;
+
+        if (isEmpty())  root = KdTreeNode.with(point2D);
+        else            root.append(point2D);
+
         size++;
     }
 
     public boolean contains(Point2D p) {
-        return root.contains(p);
+        return root.meOrDecendantEquals(p);
     }
 
     // draw all points to standard draw
@@ -67,10 +70,23 @@ public class KdTree {
         iterator().forEachRemaining(consumer);
     }
 
-    private Iterator<Point2D> iterator() {
+    public Iterator<Point2D> iterator() {
         if (isEmpty()) {
             return Collections.emptyIterator();
         }
-        return List.of(root.point2d()).iterator();
+        return root.meAndAllChildren();
+    }
+
+    public static void main(String[] args) {
+        KdTree kdtree = new KdTree();
+        List.of(new Point2D(0.1d, 0.2d), new Point2D(0.2d, 0.1d))
+            .forEach(kdtree::insert);
+        StdDraw.setPenRadius(0.015);
+        kdtree.draw();
+/*        StdDraw.setPenRadius(0.05);
+        StdDraw.setPenColor(StdDraw.BLUE);
+        StdDraw.point(0.5, 0.5);
+        StdDraw.setPenColor(StdDraw.MAGENTA);
+        StdDraw.line(0.2, 0.2, 0.8, 0.2);*/
     }
 }

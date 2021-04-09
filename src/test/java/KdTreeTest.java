@@ -30,25 +30,33 @@ class KdTreeTest {
 
     private static Stream<Arguments> test_params() {
         return Stream.of(
-                Arguments.of(
+/*                Arguments.of(
                         List.of(new Point2D(0.1d, 0.2d))
+                ),
+                Arguments.of(
+                        List.of(new Point2D(0.1d, 0.2d), new Point2D(0.2d, 0.1d))
+                )
+                ,*/
+                Arguments.of(
+                        List.of(
+                                new Point2D(0.1d, 0.2d), new Point2D(0.2d, 0.1d),
+                                new Point2D(0.3d, 0.2d), new Point2D(0.4d, 0.1d)
+                                )
                 )
         );
     }
 
     @ParameterizedTest
     @MethodSource("test_params")
-    public void one_element_point_set(
-            List<Point2D> points
-    ) {
+    public void given_point_set(List<Point2D> points) {
         //WHEN
         points.forEach(testee::insert);
 
         //THEN
         assertThat(testee.isEmpty()).isFalse();
         assertThat(testee.size()).isEqualTo(points.size());
-
         assertThat(points).allMatch(testee::contains);
+        assertThat(testee.iterator()).toIterable().containsOnlyOnceElementsOf(points);
     }
 
     /*
