@@ -1,6 +1,5 @@
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
-import edu.princeton.cs.algs4.StdDraw;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -35,7 +34,7 @@ public class KdTree {
 
     // draw all points to standard draw
     public void draw() {
-        forEach(Point2D::draw);
+        root.drawSubtree(new KdTreeCanvas());
     }
 
     // all points that are inside the rectangle (or on the boundary)
@@ -79,14 +78,11 @@ public class KdTree {
 
     public static void main(String[] args) {
         KdTree kdtree = new KdTree();
-        List.of(new Point2D(0.1d, 0.2d), new Point2D(0.2d, 0.1d))
+        List.of(
+                new Point2D(0.1d, 0.2d), new Point2D(0.2d, 0.1d),
+                new Point2D(0.3d, 0.2d), new Point2D(0.4d, 0.1d))
             .forEach(kdtree::insert);
-        StdDraw.setPenRadius(0.015);
+
         kdtree.draw();
-/*        StdDraw.setPenRadius(0.05);
-        StdDraw.setPenColor(StdDraw.BLUE);
-        StdDraw.point(0.5, 0.5);
-        StdDraw.setPenColor(StdDraw.MAGENTA);
-        StdDraw.line(0.2, 0.2, 0.8, 0.2);*/
     }
 }

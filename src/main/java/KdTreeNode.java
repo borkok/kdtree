@@ -103,4 +103,56 @@ class KdTreeNode {
         points.addAll(right.meAndAllChildrenList());
         return points;
     }
+
+    public void drawSubtree(KdTreeCanvas kdTreeCanvas) {
+        if (isEmpty())  return;
+
+        drawMe(kdTreeCanvas);
+
+        left.drawSubtree(kdTreeCanvas);
+        right.drawSubtree(kdTreeCanvas);
+    }
+
+    private void drawMe(KdTreeCanvas kdTreeCanvas) {
+        kdTreeCanvas.drawPoint(point2D);
+        if (dividesVertically()) {
+            kdTreeCanvas.drawLine(
+                    Point2DBuilder.of(point2D).y(0).build(),
+                    Point2DBuilder.of(point2D).y(1).build()
+            );
+        } else {
+            kdTreeCanvas.drawLine(
+                    Point2DBuilder.of(point2D).x(0).build(),
+                    Point2DBuilder.of(point2D).x(1).build()
+            );
+        }
+    }
+
+    private static class Point2DBuilder {
+        private double x;
+        private double y;
+
+        private static Point2DBuilder of(Point2D point2D) {
+            return new Point2DBuilder(point2D);
+        }
+
+        private Point2DBuilder(Point2D point2D) {
+            x = point2D.x();
+            y = point2D.y();
+        }
+
+        private Point2DBuilder x(double newX) {
+            x = newX;
+            return this;
+        }
+
+        private Point2DBuilder y(double newY) {
+            y = newY;
+            return this;
+        }
+
+        public Point2D build() {
+            return new Point2D(x, y);
+        }
+    }
 }
