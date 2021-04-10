@@ -69,7 +69,7 @@ public class KdTree {
      * Tree Node
      */
     private static class KdTreeNode {
-        private static final KdTreeNode EMPTY = new KdTreeNode(null, -1);
+        private static final KdTreeNode EMPTY = empty();
 
         private static final BiPredicate<MyPoint, MyPoint> childHasGreaterX = (child, parent) -> child.x > parent.x;
         private static final BiPredicate<MyPoint, MyPoint> childHasGreaterY = (child, parent) -> child.y > parent.y;
@@ -82,7 +82,7 @@ public class KdTree {
         private KdTreeNode right = EMPTY;
 
         public static KdTreeNode empty() {
-            return EMPTY;
+            return new KdTreeNode(null, -1);
         }
 
         public static KdTreeNode with(Point2D p) {
@@ -100,7 +100,7 @@ public class KdTree {
         }
 
         public boolean isEmpty() {
-            return this == EMPTY;
+            return this.point2D == null;
         }
 
         public boolean meOrDecendantEquals(Point2D searchedPoint) {
