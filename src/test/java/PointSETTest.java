@@ -33,4 +33,19 @@ class PointSETTest {
         assertThat(testee.range(TOTAL_AREA)).hasSize(1).containsOnly(new Point2D(0.1d, 0.2d));
         assertThat(testee.range(new RectHV(0.3, 0.3, 0.5, 0.6))).isEmpty();
     }
+
+    @Test
+    public void autograder_case() {
+        testee.insert(point(0.0, 1.0));
+        testee.insert(point(0.0, 1.0));
+        assertThat(testee.range(new RectHV(0.0, 0.0, 1.0, 1.0)))
+                .containsOnly(point(0.0, 1.0));
+        assertThat(testee.contains(point(1.0, 1.0))).isFalse();
+        assertThat(testee.nearest(point(0.0, 0.0)))
+                .isEqualByComparingTo(point(0.0, 1.0));
+    }
+
+    private static Point2D point(double x, double y) {
+        return new Point2D(x, y);
+    }
 }

@@ -48,7 +48,7 @@ public class PointSET {
     public Point2D nearest(Point2D p) {
         if (p == null) throw new IllegalArgumentException();
 
-        double minDistance = 1;
+        double minDistance = 2;
         Point2D champion = null;
         for (Point2D point : point2DSet) {
             double distanceSquaredTo = point.distanceSquaredTo(p);
