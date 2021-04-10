@@ -58,7 +58,6 @@ class KdTreeTest {
         assertThat(testee.isEmpty()).isFalse();
         assertThat(testee.size()).isEqualTo(points.size());
         assertThat(points).allMatch(testee::contains);
-        assertThat(testee.iterator()).toIterable().containsOnlyOnceElementsOf(points);
     }
 
     private static Stream<Arguments> test_nearest() {

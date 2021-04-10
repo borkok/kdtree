@@ -12,11 +12,11 @@ public class KdTree {
     private KdTreeNode root = KdTreeNode.empty();
     private int size = 0;
 
-    boolean isEmpty() {
+    public boolean isEmpty() {
         return size == 0;
     }
 
-    int size() {
+    public int size() {
         return size;
     }
 
@@ -52,13 +52,6 @@ public class KdTree {
         if (contains(query)) return query;
 
         return root.nearest(query);
-    }
-
-    public Iterator<Point2D> iterator() {
-        if (isEmpty()) {
-            return Collections.emptyIterator();
-        }
-        return root.meAndAllChildren();
     }
 
     public static void main(String[] args) {
