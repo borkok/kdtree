@@ -128,31 +128,44 @@ class KdTreeNode {
         }
     }
 
-    private static class Point2DBuilder {
-        private double x;
-        private double y;
-
-        private static Point2DBuilder of(Point2D point2D) {
-            return new Point2DBuilder(point2D);
-        }
-
-        private Point2DBuilder(Point2D point2D) {
-            x = point2D.x();
-            y = point2D.y();
-        }
-
-        private Point2DBuilder x(double newX) {
-            x = newX;
-            return this;
-        }
-
-        private Point2DBuilder y(double newY) {
-            y = newY;
-            return this;
-        }
-
-        public Point2D build() {
-            return new Point2D(x, y);
-        }
+    public Point2D nearest(Point2D query) {
+        return nearest(query, point2D);
     }
+
+    private Point2D nearest(Point2D query, Point2D champion) {
+        if (isEmpty()) return champion;
+
+        Point2D newChampion = champion;
+        double distanceToChampion = query.distanceSquaredTo(newChampion);
+        double distanceToMe = query.distanceSquaredTo(point2D);
+
+        if (distanceToMe < distanceToChampion)    newChampion = point2D;
+
+        BiPredicate<Point2D, Point2D> goRight = findGoRightPredicate();
+        if (goRight.test(query, this.point2D)) {
+            return findNearestInSubtreesOrdered(query, newChampion, right, left);
+        }
+        return findNearestInSubtreesOrdered(query, newChampion, left, right);
+    }
+
+    private Point2D findNearestInSubtreesOrdered(Point2D query, Point2D champion,
+                                                 KdTreeNode first, KdTreeNode second) {
+        Point2D newChampion = first.nearest(query, champion);
+        if (shouldCheckOtherSubtree(query, newChampion)) {
+            return second.nearest(query, newChampion);
+        }
+        return newChampion;
+    }
+
+    private boolean shouldCheckOtherSubtree(Point2D query, Point2D newChampion) {
+        return query.distanceSquaredTo(newChampion) > query.distanceSquaredTo(findBorderPointClosestTo(query));
+    }
+
+    private Point2D findBorderPointClosestTo(Point2D query) {
+        if (dividesVertically()) {
+            return Point2DBuilder.of(point2D).y(query.y()).build();
+        }
+        return Point2DBuilder.of(point2D).x(query.x()).build();
+    }
+
 }

@@ -49,7 +49,15 @@ public class KdTree {
     }
 
     // a nearest neighbor in the set to point p; null if the set is empty
-    public Point2D nearest(Point2D p) {
+    public Point2D nearest(Point2D query) {
+        if (query == null) throw new IllegalArgumentException();
+        if (isEmpty())  return null;
+        if (contains(query)) return query;
+
+        return root.nearest(query);
+    }
+
+    public Point2D nearestBrute(Point2D p) {
         if (p == null) throw new IllegalArgumentException();
         if (contains(p))    return p;
 
@@ -81,10 +89,22 @@ public class KdTree {
     public static void main(String[] args) {
         KdTree kdtree = new KdTree();
         List.of(
-                new Point2D(0.1d, 0.2d), new Point2D(0.2d, 0.1d),
-                new Point2D(0.3d, 0.2d), new Point2D(0.4d, 0.1d))
-            .forEach(kdtree::insert);
+                point(0.372,0.497),
+                point(0.564,0.413),
+                point(0.226,0.577),
+                point(0.144,0.179),
+                point(0.083,0.510),
+                point(0.320,0.708),
+                point(0.417,0.362),
+                point(0.862,0.825),
+                point(0.785,0.725),
+                point(0.499,0.208)
+        ).forEach(kdtree::insert);
 
         kdtree.draw();
+    }
+
+    private static Point2D point(double x, double y) {
+        return new Point2D(x, y);
     }
 }
