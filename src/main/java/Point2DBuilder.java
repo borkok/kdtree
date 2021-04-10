@@ -26,7 +26,7 @@ class Point2DBuilder {
     }
 
     static Point2D right(Point2D point2D) {
-        return new Point2D(1, point2D.x());
+        return new Point2D(1, point2D.y());
     }
 
     Point2DBuilder x(double newX) {

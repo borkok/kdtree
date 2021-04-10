@@ -3,7 +3,6 @@ import edu.princeton.cs.algs4.RectHV;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -40,12 +39,8 @@ public class KdTree {
     // all points that are inside the rectangle (or on the boundary)
     public Iterable<Point2D> range(RectHV rect) {
         if (rect == null) throw new IllegalArgumentException();
-
-        LinkedList<Point2D> points = new LinkedList<>();
-        forEach(p -> {
-            if (rect.contains(p)) points.addLast(p);
-        });
-        return points;
+        if (isEmpty())  return Collections.emptyList();
+        return root.range(rect);
     }
 
     // a nearest neighbor in the set to point p; null if the set is empty
@@ -84,6 +79,7 @@ public class KdTree {
         ).forEach(kdtree::insert);
 
         kdtree.draw();
+        new RectHV(0.3, 0.3, 0.5, 0.6).draw();
     }
 
     private static Point2D point(double x, double y) {

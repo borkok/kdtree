@@ -1,4 +1,5 @@
 import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.RectHV;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -157,4 +158,27 @@ class KdTreeNode {
         return Point2DBuilder.of(point2D).x(query.x()).build();
     }
 
+    public Iterable<Point2D> range(RectHV rect) {
+        return findInRange(rect);
+    }
+
+    private List<Point2D> findInRange(RectHV rect) {
+        if (isEmpty())  return Collections.emptyList();
+
+        LinkedList<Point2D> points = new LinkedList<>();
+        if (rect.contains(point2D)) points.add(point2D);
+        if (shouldFindInRangeInLeft(rect))    points.addAll(left.findInRange(rect));
+        if (shouldFindInRangeInRight(rect))   points.addAll(right.findInRange(rect));
+        return points;
+    }
+
+    private boolean shouldFindInRangeInLeft(RectHV rect) {
+        Point2D farLeft = new Point2D(rect.xmin(), rect.ymin());
+        return !goRightPredicate().test(farLeft, point2D);
+    }
+
+    private boolean shouldFindInRangeInRight(RectHV rect) {
+        Point2D farRight = new Point2D(rect.xmax(), rect.ymax());
+        return goRightPredicate().test(farRight, point2D);
+    }
 }

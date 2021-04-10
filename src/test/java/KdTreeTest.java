@@ -15,7 +15,7 @@ class KdTreeTest {
     private static final RectHV TOTAL_AREA = new RectHV(0, 0, 1, 1);
     private KdTree testee;
     private PointSET pointSET;
-    
+
     @BeforeEach
     void setUp() {
         testee = new KdTree();
@@ -43,7 +43,7 @@ class KdTreeTest {
                         List.of(
                                 point(0.1d, 0.2d), point(0.2d, 0.1d),
                                 point(0.3d, 0.2d), point(0.4d, 0.1d)
-                                )
+                        )
                 )
         );
     }
@@ -74,25 +74,25 @@ class KdTreeTest {
                 Arguments.of(
                         point(0.1d, 0.2d),
                         List.of(
-                                point(0.000000,0.500000),
-                                point(0.500000,1.000000),
-                                point(0.500000,0.000000),
-                                point(1.000000,0.500000)
+                                point(0.000000, 0.500000),
+                                point(0.500000, 1.000000),
+                                point(0.500000, 0.000000),
+                                point(1.000000, 0.500000)
                         )
                 ),
                 Arguments.of(
                         point(0.5d, 0.5d),
                         List.of(
-                                point(0.372,0.497),
-                                point(0.564,0.413),
-                                point(0.226,0.577),
-                                point(0.144,0.179),
-                                point(0.083,0.510),
-                                point(0.320,0.708),
-                                point(0.417,0.362),
-                                point(0.862,0.825),
-                                point(0.785,0.725),
-                                point(0.499,0.208)
+                                point(0.372, 0.497),
+                                point(0.564, 0.413),
+                                point(0.226, 0.577),
+                                point(0.144, 0.179),
+                                point(0.083, 0.510),
+                                point(0.320, 0.708),
+                                point(0.417, 0.362),
+                                point(0.862, 0.825),
+                                point(0.785, 0.725),
+                                point(0.499, 0.208)
                         )
                 )
         );
@@ -110,10 +110,61 @@ class KdTreeTest {
         System.out.println(result.toString());
     }
 
-    @Test
-    public void find_in_range() {
-        //assertThat(testee.range(TOTAL_AREA)).hasSize(1).containsOnly(point(0.1d, 0.2d));
-        ///assertThat(testee.range(new RectHV(0.3, 0.3, 0.5, 0.6))).isEmpty();
+    private static Stream<Arguments> test_in_range() {
+        return Stream.of(
+                Arguments.of(
+                        new RectHV(0.3, 0.3, 0.5, 0.6),
+                        List.of(point(0.1d, 0.2d))
+                ),
+                Arguments.of(
+                        new RectHV(0.3, 0.3, 0.5, 0.6),
+                        List.of(
+                                point(0.000000, 0.500000),
+                                point(0.500000, 1.000000),
+                                point(0.500000, 0.000000),
+                                point(1.000000, 0.500000)
+                        )
+                ),
+                Arguments.of(
+                        new RectHV(0.3, 0.3, 0.5, 0.6),
+                        List.of(
+                                point(0.372, 0.497),
+                                point(0.564, 0.413),
+                                point(0.226, 0.577),
+                                point(0.144, 0.179),
+                                point(0.083, 0.510),
+                                point(0.320, 0.708),
+                                point(0.417, 0.362),
+                                point(0.862, 0.825),
+                                point(0.785, 0.725),
+                                point(0.499, 0.208)
+                        )
+                ),
+                Arguments.of(
+                        new RectHV(0.3, 0.1, 0.5, 0.2),
+                        List.of(
+                                point(0.9, 0.5),
+                                point(0.2, 0.5),
+                                point(0.3, 0.5),
+                                point(0.4, 0.5),
+                                point(0.1, 0.5),
+                                point(0.6, 0.5),
+                                point(0.5, 0.5),
+                                point(0.7, 0.5)
+                        )
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("test_in_range")
+    public void find_in_range(RectHV rectHV, List<Point2D> points) {
+        points.forEach(testee::insert);
+        points.forEach(pointSET::insert);
+
+        Iterable<Point2D> result = testee.range(rectHV);
+
+        assertThat(result).containsAll(pointSET.range(rectHV));
     }
 
     private static Point2D point(double x, double y) {
