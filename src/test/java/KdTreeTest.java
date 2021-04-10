@@ -28,15 +28,15 @@ class KdTreeTest {
         assertThat(testee.range(TOTAL_AREA)).isEmpty();
     }
 
-    private static Stream<Arguments> test_params() {
+    private static Stream<Arguments> test_point_set() {
         return Stream.of(
-/*                Arguments.of(
+                Arguments.of(
                         List.of(new Point2D(0.1d, 0.2d))
                 ),
                 Arguments.of(
                         List.of(new Point2D(0.1d, 0.2d), new Point2D(0.2d, 0.1d))
                 )
-                ,*/
+                ,
                 Arguments.of(
                         List.of(
                                 new Point2D(0.1d, 0.2d), new Point2D(0.2d, 0.1d),
@@ -47,7 +47,7 @@ class KdTreeTest {
     }
 
     @ParameterizedTest
-    @MethodSource("test_params")
+    @MethodSource("test_point_set")
     public void given_point_set(List<Point2D> points) {
         //WHEN
         points.forEach(testee::insert);
@@ -59,13 +59,31 @@ class KdTreeTest {
         assertThat(testee.iterator()).toIterable().containsOnlyOnceElementsOf(points);
     }
 
-    /*
-    @Test
-    public void find_nearest() {
-        assertThat(testee.nearest(new Point2D(0.3d, 0.6d))).isEqualByComparingTo(new Point2D(0.1d, 0.2d));
-        assertThat(testee.range(TOTAL_AREA)).hasSize(1).containsOnly(new Point2D(0.1d, 0.2d));
-        assertThat(testee.range(new RectHV(0.3, 0.3, 0.5, 0.6))).isEmpty();
+    private static Stream<Arguments> test_nearest() {
+        return Stream.of(
+                Arguments.of(
+                        new Point2D(0.1d, 0.2d),
+                        List.of(new Point2D(0.1d, 0.2d)),
+                        new Point2D(0.1d, 0.2d)
+                ),
+                Arguments.of(
+                        new Point2D(0.2d, 0.2d),
+                        List.of(new Point2D(0.1d, 0.2d)),
+                        new Point2D(0.1d, 0.2d)
+                )
+        );
     }
 
-     */
+    @ParameterizedTest
+    @MethodSource("test_nearest")
+    public void find_nearest(Point2D query, List<Point2D> points, Point2D result) {
+        points.forEach(testee::insert);
+        assertThat(testee.nearest(query)).isEqualByComparingTo(result);
+    }
+
+    @Test
+    public void find_in_range() {
+        //assertThat(testee.range(TOTAL_AREA)).hasSize(1).containsOnly(new Point2D(0.1d, 0.2d));
+        ///assertThat(testee.range(new RectHV(0.3, 0.3, 0.5, 0.6))).isEmpty();
+    }
 }

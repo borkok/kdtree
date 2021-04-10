@@ -51,11 +51,13 @@ public class KdTree {
     // a nearest neighbor in the set to point p; null if the set is empty
     public Point2D nearest(Point2D p) {
         if (p == null) throw new IllegalArgumentException();
+        if (contains(p))    return p;
 
         double minDistance = 1;
         Point2D champion = null;
-        while (iterator().hasNext()) {
-            Point2D point = iterator().next();
+        Iterator<Point2D> iterator = iterator();
+        while (iterator.hasNext()) {
+            Point2D point = iterator.next();
             double distanceSquaredTo = point.distanceSquaredTo(p);
             if (distanceSquaredTo < minDistance) {
                 minDistance = distanceSquaredTo;
