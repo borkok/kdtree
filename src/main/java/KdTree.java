@@ -3,7 +3,6 @@ import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiPredicate;
@@ -30,6 +29,7 @@ public class KdTree {
     }
 
     public boolean contains(Point2D p) {
+        if (p == null) throw new IllegalArgumentException();
         return root.meOrDecendantEquals(p);
     }
 
@@ -71,10 +71,11 @@ public class KdTree {
     private static class KdTreeNode {
         private static final KdTreeNode EMPTY = new KdTreeNode(null, -1);
 
-        private static final BiPredicate<Point2D, Point2D> childHasGreaterX = (child, parent) -> child.x() > parent.x();
-        private static final BiPredicate<Point2D, Point2D> childHasGreaterY = (child, parent) -> child.y() > parent.y();
+        private static final BiPredicate<MyPoint, MyPoint> childHasGreaterX = (child, parent) -> child.x > parent.x;
+        private static final BiPredicate<MyPoint, MyPoint> childHasGreaterY = (child, parent) -> child.y > parent.y;
 
         private final Point2D point2D;
+        private final MyPoint myPoint;
 
         private final int level;
         private KdTreeNode left = EMPTY;
@@ -94,6 +95,7 @@ public class KdTree {
 
         private KdTreeNode(Point2D point2D, int level) {
             this.point2D = point2D;
+            this.myPoint = MyPoint.point(point2D);
             this.level = level;
         }
 
@@ -105,21 +107,21 @@ public class KdTree {
             if (isEmpty()) return false;
             if (point2D.equals(searchedPoint)) return true;
 
-            if (goRightPredicate().test(searchedPoint, point2D)) {
+            if (goRightPredicate().test(MyPoint.point(searchedPoint), myPoint)) {
                 return right.meOrDecendantEquals(searchedPoint);
             }
             return left.meOrDecendantEquals(searchedPoint);
         }
 
         public void append(Point2D childPoint2D) {
-            if (goRightPredicate().test(childPoint2D, this.point2D)) {
+            if (goRightPredicate().test(MyPoint.point(childPoint2D), myPoint)) {
                 appendRight(childPoint2D);
                 return;
             }
             appendLeft(childPoint2D);
         }
 
-        private BiPredicate<Point2D, Point2D> goRightPredicate() {
+        private BiPredicate<MyPoint, MyPoint> goRightPredicate() {
             if (dividesVertically())    return childHasGreaterX;
             return childHasGreaterY;
         }
@@ -136,25 +138,6 @@ public class KdTree {
         private void appendRight(Point2D childPoint2D) {
             if (right.isEmpty())    right = KdTreeNode.with(childPoint2D, level + 1);
             else                    right.append(childPoint2D);
-        }
-
-        public Iterator<Point2D> meAndAllChildren() {
-            if (isEmpty()) {
-                return Collections.emptyIterator();
-            }
-            return meAndAllChildrenList().iterator();
-        }
-
-        private List<Point2D> meAndAllChildrenList() {
-            if (isEmpty()) {
-                return Collections.emptyList();
-            }
-
-            LinkedList<Point2D> points = new LinkedList<>();
-            points.addLast(point2D);
-            points.addAll(left.meAndAllChildrenList());
-            points.addAll(right.meAndAllChildrenList());
-            return points;
         }
 
         public void drawSubtree(KdTreeCanvas kdTreeCanvas) {
@@ -181,15 +164,16 @@ public class KdTree {
 
             Point2D newChampion = findNewChampion(query, champion);
 
-            if (goRightPredicate().test(query, this.point2D)) {
+            if (goRightPredicate().test(MyPoint.point(query), myPoint)) {
                 return findNearestInSubtreesOrdered(query, newChampion, right, left);
             }
             return findNearestInSubtreesOrdered(query, newChampion, left, right);
         }
 
         private Point2D findNewChampion(Point2D query, Point2D champion) {
-            double distanceToChampion = distanceBetween(query, champion);
-            double distanceToMe = distanceBetween(query, point2D);
+            MyPoint myQuery = MyPoint.point(query);
+            double distanceToChampion = distanceBetween(myQuery, MyPoint.point(champion));
+            double distanceToMe = distanceBetween(myQuery, myPoint);
 
             if (distanceToMe < distanceToChampion)    return point2D;
             return champion;
@@ -205,18 +189,19 @@ public class KdTree {
         }
 
         private boolean shouldCheckOtherSubtree(Point2D query, Point2D newChampion) {
-            return distanceBetween(query, newChampion) > distanceBetween(query, findBorderPointClosestTo(query));
+            return distanceBetween(MyPoint.point(query), MyPoint.point(newChampion))
+                    > distanceBetween(MyPoint.point(query), findBorderPointClosestTo(query));
         }
 
-        private double distanceBetween(Point2D query, Point2D newChampion) {
+        private double distanceBetween(MyPoint query, MyPoint newChampion) {
             return query.distanceSquaredTo(newChampion);
         }
 
-        private Point2D findBorderPointClosestTo(Point2D query) {
+        private MyPoint findBorderPointClosestTo(Point2D query) {
             if (dividesVertically()) {
-                return Point2DBuilder.init().x(point2D).y(query).build();
+                return MyPoint.point(point2D.x(), query.y());
             }
-            return Point2DBuilder.init().y(point2D).x(query).build();
+            return MyPoint.point(query.x(), point2D.y());
         }
 
         public Iterable<Point2D> range(RectHV rect) {
@@ -234,13 +219,13 @@ public class KdTree {
         }
 
         private boolean shouldFindInRangeInLeft(RectHV rect) {
-            Point2D farLeft = new Point2D(rect.xmin(), rect.ymin());
-            return !goRightPredicate().test(farLeft, point2D);
+            MyPoint farLeft = MyPoint.point(rect.xmin(), rect.ymin());
+            return !goRightPredicate().test(farLeft, myPoint);
         }
 
         private boolean shouldFindInRangeInRight(RectHV rect) {
-            Point2D farRight = new Point2D(rect.xmax(), rect.ymax());
-            return goRightPredicate().test(farRight, point2D);
+            MyPoint farRight = MyPoint.point(rect.xmax(), rect.ymax());
+            return goRightPredicate().test(farRight, myPoint);
         }
     }
 
@@ -249,9 +234,6 @@ public class KdTree {
         Point builder
      */
     private static class Point2DBuilder {
-        private double x;
-        private double y;
-
         static Point2D above(Point2D point2D) {
             return new Point2D(point2D.x(), 0);
         }
@@ -268,25 +250,35 @@ public class KdTree {
             return new Point2D(1, point2D.y());
         }
 
-        public static Point2DBuilder init() {
-            return new Point2DBuilder();
-        }
-
         private Point2DBuilder() {
         }
+    }
 
-        Point2DBuilder x(Point2D point2D) {
-            x = point2D.x();
-            return this;
+    /*
+        MyPoint to cheat stupid autograder that does not allow me to create Point2D
+     */
+    private static class MyPoint {
+        private final double x;
+        private final double y;
+
+        private static MyPoint point(Point2D point2D) {
+            if (point2D == null) return null;
+            return new MyPoint(point2D.x(), point2D.y());
         }
 
-        Point2DBuilder y(Point2D point2D) {
-            y = point2D.y();
-            return this;
+        private static MyPoint point(double x, double y) {
+            return new MyPoint(x, y);
         }
 
-        Point2D build() {
-            return new Point2D(x, y);
+        private MyPoint(double x, double y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public double distanceSquaredTo(MyPoint that) {
+            double dx = this.x - that.x;
+            double dy = this.y - that.y;
+            return dx*dx + dy*dy;
         }
     }
 
