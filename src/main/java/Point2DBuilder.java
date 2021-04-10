@@ -13,6 +13,22 @@ class Point2DBuilder {
         y = point2D.y();
     }
 
+    static Point2D above(Point2D point2D) {
+        return new Point2D(point2D.x(), 0);
+    }
+
+    static Point2D below(Point2D point2D) {
+        return new Point2D(point2D.x(), 1);
+    }
+
+    static Point2D left(Point2D point2D) {
+        return new Point2D(0, point2D.y());
+    }
+
+    static Point2D right(Point2D point2D) {
+        return new Point2D(1, point2D.x());
+    }
+
     Point2DBuilder x(double newX) {
         x = newX;
         return this;

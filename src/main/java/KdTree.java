@@ -57,24 +57,6 @@ public class KdTree {
         return root.nearest(query);
     }
 
-    public Point2D nearestBrute(Point2D p) {
-        if (p == null) throw new IllegalArgumentException();
-        if (contains(p))    return p;
-
-        double minDistance = 1;
-        Point2D champion = null;
-        Iterator<Point2D> iterator = iterator();
-        while (iterator.hasNext()) {
-            Point2D point = iterator.next();
-            double distanceSquaredTo = point.distanceSquaredTo(p);
-            if (distanceSquaredTo < minDistance) {
-                minDistance = distanceSquaredTo;
-                champion = point;
-            }
-        }
-        return champion;
-    }
-
     private void forEach(Consumer<Point2D> consumer) {
         iterator().forEachRemaining(consumer);
     }

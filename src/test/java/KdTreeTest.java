@@ -14,10 +14,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 class KdTreeTest {
     private static final RectHV TOTAL_AREA = new RectHV(0, 0, 1, 1);
     private KdTree testee;
+    private PointSET pointSET;
     
     @BeforeEach
     void setUp() {
         testee = new KdTree();
+        pointSET = new PointSET();
     }
 
     @Test
@@ -70,7 +72,7 @@ class KdTreeTest {
                         List.of(point(0.1d, 0.2d))
                 ),
                 Arguments.of(
-                        point(0.2d, 0.2d),
+                        point(0.1d, 0.2d),
                         List.of(
                                 point(0.000000,0.500000),
                                 point(0.500000,1.000000),
@@ -100,8 +102,11 @@ class KdTreeTest {
     @MethodSource("test_nearest")
     public void find_nearest(Point2D query, List<Point2D> points) {
         points.forEach(testee::insert);
+        points.forEach(pointSET::insert);
+
         Point2D result = testee.nearest(query);
-        assertThat(result).isEqualByComparingTo(testee.nearestBrute(query));
+
+        assertThat(result).isEqualByComparingTo(pointSET.nearest(query));
         System.out.println(result.toString());
     }
 

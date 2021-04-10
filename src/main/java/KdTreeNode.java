@@ -43,24 +43,21 @@ class KdTreeNode {
         if (isEmpty()) return false;
         if (point2D.equals(searchedPoint)) return true;
 
-        BiPredicate<Point2D, Point2D> isChildCoordGreater = findGoRightPredicate();
-        if (isChildCoordGreater.test(searchedPoint, point2D)) {
+        if (goRightPredicate().test(searchedPoint, point2D)) {
             return right.meOrDecendantEquals(searchedPoint);
         }
         return left.meOrDecendantEquals(searchedPoint);
     }
 
     public void append(Point2D childPoint2D) {
-        BiPredicate<Point2D, Point2D> goRight = findGoRightPredicate();
-
-        if (goRight.test(childPoint2D, this.point2D)) {
+        if (goRightPredicate().test(childPoint2D, this.point2D)) {
             appendRight(childPoint2D);
             return;
         }
         appendLeft(childPoint2D);
     }
 
-    private BiPredicate<Point2D, Point2D> findGoRightPredicate() {
+    private BiPredicate<Point2D, Point2D> goRightPredicate() {
         if (dividesVertically())    return childHasGreaterX;
         return childHasGreaterY;
     }
@@ -70,19 +67,13 @@ class KdTreeNode {
     }
 
     private void appendLeft(Point2D childPoint2D) {
-        KdTreeNode node = createChildKdTreeNode(childPoint2D);
-        if (left.isEmpty())     left = node;
+        if (left.isEmpty())     left = KdTreeNode.with(childPoint2D, level + 1);
         else                    left.append(childPoint2D);
     }
 
     private void appendRight(Point2D childPoint2D) {
-        KdTreeNode node = createChildKdTreeNode(childPoint2D);
-        if (right.isEmpty())    right = node;
+        if (right.isEmpty())    right = KdTreeNode.with(childPoint2D, level + 1);
         else                    right.append(childPoint2D);
-    }
-
-    private KdTreeNode createChildKdTreeNode(Point2D childPoint2D) {
-        return KdTreeNode.with(childPoint2D, level + 1);
     }
 
     public Iterator<Point2D> meAndAllChildren() {
@@ -115,17 +106,8 @@ class KdTreeNode {
 
     private void drawMe(KdTreeCanvas kdTreeCanvas) {
         kdTreeCanvas.drawPoint(point2D);
-        if (dividesVertically()) {
-            kdTreeCanvas.drawLine(
-                    Point2DBuilder.of(point2D).y(0).build(),
-                    Point2DBuilder.of(point2D).y(1).build()
-            );
-        } else {
-            kdTreeCanvas.drawLine(
-                    Point2DBuilder.of(point2D).x(0).build(),
-                    Point2DBuilder.of(point2D).x(1).build()
-            );
-        }
+        if (dividesVertically())    kdTreeCanvas.drawVerticalLine(point2D);
+        else                        kdTreeCanvas.drawHorizontalLine(point2D);
     }
 
     public Point2D nearest(Point2D query) {
@@ -135,17 +117,20 @@ class KdTreeNode {
     private Point2D nearest(Point2D query, Point2D champion) {
         if (isEmpty()) return champion;
 
-        Point2D newChampion = champion;
-        double distanceToChampion = query.distanceSquaredTo(newChampion);
-        double distanceToMe = query.distanceSquaredTo(point2D);
+        Point2D newChampion = findNewChampion(query, champion);
 
-        if (distanceToMe < distanceToChampion)    newChampion = point2D;
-
-        BiPredicate<Point2D, Point2D> goRight = findGoRightPredicate();
-        if (goRight.test(query, this.point2D)) {
+        if (goRightPredicate().test(query, this.point2D)) {
             return findNearestInSubtreesOrdered(query, newChampion, right, left);
         }
         return findNearestInSubtreesOrdered(query, newChampion, left, right);
+    }
+
+    private Point2D findNewChampion(Point2D query, Point2D champion) {
+        double distanceToChampion = distanceBetween(query, champion);
+        double distanceToMe = distanceBetween(query, point2D);
+
+        if (distanceToMe < distanceToChampion)    return point2D;
+        return champion;
     }
 
     private Point2D findNearestInSubtreesOrdered(Point2D query, Point2D champion,
@@ -158,7 +143,11 @@ class KdTreeNode {
     }
 
     private boolean shouldCheckOtherSubtree(Point2D query, Point2D newChampion) {
-        return query.distanceSquaredTo(newChampion) > query.distanceSquaredTo(findBorderPointClosestTo(query));
+        return distanceBetween(query, newChampion) > distanceBetween(query, findBorderPointClosestTo(query));
+    }
+
+    private double distanceBetween(Point2D query, Point2D newChampion) {
+        return query.distanceSquaredTo(newChampion);
     }
 
     private Point2D findBorderPointClosestTo(Point2D query) {
